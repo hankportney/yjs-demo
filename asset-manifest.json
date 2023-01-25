@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/yjs-demo/static/css/main.7a11ec9b.css",
+    "main.js": "/yjs-demo/static/js/main.1f59aa9d.js",
+    "index.html": "/yjs-demo/index.html",
+    "main.7a11ec9b.css.map": "/yjs-demo/static/css/main.7a11ec9b.css.map",
+    "main.1f59aa9d.js.map": "/yjs-demo/static/js/main.1f59aa9d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7a11ec9b.css",
+    "static/js/main.1f59aa9d.js"
+  ]
+}
