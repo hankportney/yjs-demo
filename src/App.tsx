@@ -2,7 +2,6 @@ import {
 	Badge,
 	Box,
 	Button,
-	ButtonGroup,
 	Divider,
 	Flex,
 	Heading,
@@ -17,6 +16,7 @@ import { WebrtcProvider } from "y-webrtc";
 import { Array as YArray, Doc, UndoManager } from "yjs";
 import CheckboxRow from "./components/CheckboxRow";
 import CreateTodoForm from "./components/CreateTodoForm";
+import UndoRedoButtons from "./components/UndoRedoButtons";
 
 interface Todo {
 	title: string;
@@ -160,10 +160,7 @@ function App() {
 							{provider.connected ? "Disconnect" : "Connect"}
 						</Button>
 					</Flex>
-					<ButtonGroup size="sm">
-						<Button onClick={() => undoManager.undo()}>Undo</Button>
-						<Button onClick={() => undoManager.redo()}>Redo</Button>
-					</ButtonGroup>
+
 					<Divider />
 					{provider.connected && (
 						<VStack align="left">
@@ -210,6 +207,10 @@ function App() {
 							setInputValue("");
 						}}
 					/>
+					<UndoRedoButtons
+						onUndo={() => undoManager.undo()}
+						onRedo={() => undoManager.redo()}
+					/>
 					<Divider />
 					<Flex direction="column">
 						{todos.map((todo, index) => (
@@ -217,7 +218,7 @@ function App() {
 								key={`Todo_${index}`}
 								isChecked={todos[index].completed}
 								onChange={(e) => {
-									// Transact changes to make change to list at same time.
+									// Transact to bundle two chaanges into one update.
 									sharedTodos.doc?.transact(() => {
 										sharedTodos.insert(index, [
 											{
