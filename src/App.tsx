@@ -1,26 +1,22 @@
-import { DeleteIcon } from "@chakra-ui/icons";
 import {
 	Badge,
 	Box,
 	Button,
 	ButtonGroup,
-	Checkbox,
 	Divider,
 	Flex,
-	FormControl,
 	Heading,
 	HStack,
-	IconButton,
-	Input,
 	Text,
-	Tooltip,
 	VStack,
 } from "@chakra-ui/react";
 //@ts-ignore
 import ColorHash from "color-hash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WebrtcProvider } from "y-webrtc";
-import { Array as YArray, Doc, UndoManager } from "yjs";
+import { Array, Array as YArray, Doc, UndoManager } from "yjs";
+import CheckboxRow from "./components/CheckboxRow";
+import CreateTodoForm from "./components/CreateTodoForm";
 
 interface Todo {
 	title: string;
@@ -87,6 +83,7 @@ function App() {
 
 	useEffect(() => {
 		provider?.awareness.on("update", () => {
+			//@ts-ignore
 			setAwareness(Array.from(provider.awareness.getStates().values()));
 		});
 	}, [provider]);
@@ -202,8 +199,9 @@ function App() {
 					gap="1.5rem"
 					minW="25rem"
 				>
-					<Flex
-						as="form"
+					<CreateTodoForm
+						inputValue={inputValue}
+						setInputValue={setInputValue}
 						onSubmit={(e) => {
 							e.preventDefault();
 							sharedTodos.push([
@@ -212,106 +210,34 @@ function App() {
 							undoManager.stopCapturing();
 							setInputValue("");
 						}}
-						direction="column"
-						gap="1rem"
-					>
-						<FormControl isRequired>
-							<Input
-								value={inputValue}
-								onChange={(e) => setInputValue(e.target.value)}
-								placeholder="Enter a todo list item"
-							/>
-						</FormControl>
-
-						<Tooltip
-							label={
-								inputValue.trim() === ""
-									? "Enter item text to continue."
-									: "Create a todo item."
-							}
-							hasArrow
-							shouldWrapChildren={inputValue.trim() === ""}
-						>
-							<Button
-								w="100%"
-								colorScheme="blue"
-								type="submit"
-								isDisabled={inputValue.trim() === ""}
-							>
-								Create todo list item
-							</Button>
-						</Tooltip>
-					</Flex>
+					/>
 					<Divider />
 					<Flex direction="column">
-						{todos.map((todo, index) => {
-							return (
-								<Flex
-									align="center"
-									justify="space-between"
-									pl="0.5rem"
-									pr="0.25rem"
-									h="2.5rem"
-									key={`Todo_${index}`}
-									_hover={{ bg: "gray.100" }}
-								>
-									<Checkbox
-										h="100%"
-										flexGrow={1}
-										minW={0}
-										display="flex"
-										flexDirection="row"
-										alignItems="center"
-										cursor="pointer"
-										isChecked={todos[index].completed}
-										onChange={(e) => {
-											// Transact changes to make change to list at same time.
-											sharedTodos.doc?.transact(() => {
-												sharedTodos.insert(index, [
-													{
-														...sharedTodos.get(
-															index
-														),
-														completed:
-															e.target.checked,
-													},
-												]);
-												sharedTodos.delete(
-													index + 1,
-													1
-												);
-											});
-											undoManager.stopCapturing();
-										}}
-										__css={{
-											".chakra-checkbox__label": {
-												flexGrow: 1,
-												minWidth: 0,
+						{todos.map((todo, index) => (
+							<CheckboxRow
+								key={`Todo_${index}`}
+								isChecked={todos[index].completed}
+								onChange={(e) => {
+									// Transact changes to make change to list at same time.
+									sharedTodos.doc?.transact(() => {
+										sharedTodos.insert(index, [
+											{
+												...sharedTodos.get(index),
+												completed: e.target.checked,
 											},
-										}}
-									>
-										<Text
-											noOfLines={1}
-											flexGrow={1}
-											minW={0}
-										>
-											{todo.title}
-										</Text>
-									</Checkbox>
-									<IconButton
-										size="sm"
-										variant="ghost"
-										icon={<DeleteIcon />}
-										colorScheme="red"
-										aria-label={`Delete todo list item: ${todo.title}`}
-										onClick={() => {
-											sharedTodos.delete(index);
-											undoManager.stopCapturing();
-										}}
-									/>
-								</Flex>
-							);
-						})}
+										]);
+										sharedTodos.delete(index + 1, 1);
+									});
+									undoManager.stopCapturing();
+								}}
+								onDelete={() => {
+									sharedTodos.delete(index);
+									undoManager.stopCapturing();
+								}}
+							>
+								{todo.title}
+							</CheckboxRow>
+						))}
 					</Flex>
 				</Flex>
 			</Flex>
