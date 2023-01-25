@@ -14,7 +14,7 @@ import {
 import ColorHash from "color-hash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WebrtcProvider } from "y-webrtc";
-import { Array, Array as YArray, Doc, UndoManager } from "yjs";
+import { Array as YArray, Doc, UndoManager } from "yjs";
 import CheckboxRow from "./components/CheckboxRow";
 import CreateTodoForm from "./components/CreateTodoForm";
 
@@ -83,7 +83,6 @@ function App() {
 
 	useEffect(() => {
 		provider?.awareness.on("update", () => {
-			//@ts-ignore
 			setAwareness(Array.from(provider.awareness.getStates().values()));
 		});
 	}, [provider]);
